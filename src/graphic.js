@@ -3,6 +3,12 @@ const privatePropertySet = Symbol('privatePropertySet');
 const BFS = Symbol('BFS');
 const DFS = Symbol('DFS');
 
+const PointStatus = {
+  unknown: 0,
+  checking: 1,
+  known: 2
+};
+
 export class Point {
   constructor(name) {
     this[privatePropertySet] = {
@@ -88,11 +94,99 @@ export class DirectionGraphic {
     });
   }
 
+  [BFS](from) {
+    let result = [];
+
+    let points = [];
+    let status = [];
+
+    points.push(from);
+    status[from.id] = PointStatus.known;
+    while (points.length > 0) {
+      let p = points.shift();
+      let nextPoints = this.nextPoints[p.id];
+      nextPoints.forEach(elem => {
+        if (status[elem.id] === PointStatus.known) {
+          return;
+        }
+        points.push(elem);
+        status[elem.id] = PointStatus.known;
+      });
+      result.push(p);
+    }
+    return result;
+  }
+
+  [DFS](from) {
+    let result = [];
+
+    let points = [];
+    let status = [];
+    let nextPointsCollection = this.nextPoints;
+
+    recursion(from);
+
+    return result;
+
+    function recursion(point) {
+      points.push(point);
+      result.push(point);
+      status[point.id] = PointStatus.checking;
+
+      let nextPoints = nextPointsCollection[point.id];
+      if (nextPoints.length > 0) {
+        nextPoints.forEach(p => {
+          if (status[p.id] === PointStatus.checking || status[p.id] === PointStatus.known) {
+            return;
+          }
+          recursion(p);
+        });
+      }
+      let p = points.pop();
+      status[p.id] = PointStatus.known;
+    }
+  }
+
+  sortByDFS() {
+    let inDegreeZero = this.points.filter(elem => elem.inDegree === 0);
+    if (inDegreeZero.length === 0) {
+      return ['存在圈，无法拓扑排序'];
+    }
+    let status = [];
+    let nextPointsCollection = this.nextPoints;
+    let orderdPoints = [];
+    while (inDegreeZero.length > 0) {
+      let from = inDegreeZero.shift();
+      recursion(from);
+    }
+
+    return orderdPoints;
+
+    function recursion(point) {
+      let nextPoints = nextPointsCollection[point.id];
+      if (nextPoints.length > 0) {
+        nextPoints.forEach(p => {
+          if (status[p.id] === PointStatus.known) {
+            return;
+          }
+          recursion(p);
+        });
+      }
+      status[point.id] = PointStatus.known;
+      orderdPoints.unshift(point);
+    }
+  }
+
   sort() {
     let inDegreeZero = this.points.filter(elem => elem.inDegree === 0);
     if (inDegreeZero.length === 0) {
       return ['存在圈，无法拓扑排序'];
     }
+    //缓存住indegree的初始值
+    this.points.forEach(p => {
+      p.__originIndegree = p.inDegree;
+    });
+
     let orderdPoints = [];
     while (inDegreeZero.length > 0) {
       let p = inDegreeZero.shift();
@@ -107,6 +201,10 @@ export class DirectionGraphic {
     if (orderdPoints.length < this.points.length) {
       orderdPoints.push('剩余节点存在圈，无法拓扑排序');
     }
+    //恢复indegree的初始值
+    this.points.forEach(p => {
+      p.inDegree = p.__originIndegree;
+    });
 
     return orderdPoints;
   }
@@ -168,13 +266,22 @@ export function run() {
     console.log(`${elem.toString()} inDegree: ${elem.inDegree}`);
   });
 
-  let orderdPoints = dg.sort();
-  console.log(orderdPoints.map(elem => elem.toString()).join());
+  let bfsPoints = dg[BFS](points[1]);
+  console.log(`BFS搜索：${bfsPoints.map(elem => elem.toString()).join()}`);
 
-  let from = points[1];
-  console.log(`节点${from.toString()}到以下个节点的无权最短路径分别是：`);
-  let paths = dg.shortestPathWithoutWeight(from);
-  points.forEach((elem, index) => {
-    console.log(`----到节点${elem.toString()}： ${paths[index]}`);
-  });
+  let dfsPoints = dg[DFS](points[1]);
+  console.log(`DFS搜索：${dfsPoints.map(elem => elem.toString()).join()}`);
+
+  let orderdPoints1 = dg.sortByDFS();
+  console.log(`基于DFS搜索的拓扑排序：${orderdPoints1.map(elem => elem.toString()).join()}`);
+
+  let orderdPoints = dg.sort();
+  console.log(`拓扑排序：${orderdPoints.map(elem => elem.toString()).join()}`);
+
+  // let from = points[1];
+  // console.log(`节点${from.toString()}到以下个节点的无权最短路径分别是：`);
+  // let paths = dg.shortestPathWithoutWeight(from);
+  // points.forEach((elem, index) => {
+  //   console.log(`----到节点${elem.toString()}： ${paths[index]}`);
+  // });
 }
