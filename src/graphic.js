@@ -120,7 +120,6 @@ export class DirectionGraphic {
   [DFS](from) {
     let result = [];
 
-    let points = [];
     let status = [];
     let nextPointsCollection = this.nextPoints;
 
@@ -129,7 +128,6 @@ export class DirectionGraphic {
     return result;
 
     function recursion(point) {
-      points.push(point);
       result.push(point);
       status[point.id] = PointStatus.checking;
 
@@ -142,8 +140,7 @@ export class DirectionGraphic {
           recursion(p);
         });
       }
-      let p = points.pop();
-      status[p.id] = PointStatus.known;
+      status[point.id] = PointStatus.known;
     }
   }
 
