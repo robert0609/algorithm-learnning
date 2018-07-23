@@ -2,6 +2,7 @@
 const privatePropertySet = Symbol('privatePropertySet');
 const BFS = Symbol('BFS');
 const DFS = Symbol('DFS');
+const dijkstra = Symbol('Dijkstra');
 
 const PointStatus = {
   unknown: 0,
@@ -233,6 +234,10 @@ export class DirectionGraphic {
     }
 
     return paths;
+  }
+
+  [dijkstra]() {
+    //TODO:
   }
 }
 

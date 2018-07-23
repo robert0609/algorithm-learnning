@@ -1,5 +1,5 @@
 
-const privatePropertySet = Symbol('privatePropertySet');
+const privatePropertySet = Symbol('basePrivatePropertySet');
 const computeNodeCount = Symbol('computeNodeCount');
 
 function parameterCanNotBeNull(name) {
@@ -13,10 +13,19 @@ export class BinarySearchTreeNode {
   } = {}) {
     this[privatePropertySet] = {
       value,
-      leftChild: (!leftChild || leftChild.nodeCount === 0) ? null : leftChild,
-      rightChild: (!rightChild || rightChild.nodeCount === 0) ? null : rightChild,
+      parent: null,
+      leftChild: null,
+      rightChild: null,
       isDelete: false
     };
+    if (leftChild && leftChild.nodeCount > 0) {
+      this[privatePropertySet].leftChild = leftChild;
+      leftChild.parent = this;
+    }
+    if (rightChild && rightChild.nodeCount > 0) {
+      this[privatePropertySet].rightChild = rightChild;
+      rightChild.parent = this;
+    }
     this[computeNodeCount]();
 
     Object.defineProperties(this, {
@@ -38,15 +47,29 @@ export class BinarySearchTreeNode {
         },
         enumerable: true
       },
+      parent: {
+        get() {
+          return this[privatePropertySet].parent;
+        },
+        enumerable: true
+      },
       leftChild: {
         get() {
           return this[privatePropertySet].leftChild;
+        },
+        set(v) {
+          this[privatePropertySet].leftChild = v;
+          v.parent = this;
         },
         enumerable: true
       },
       rightChild: {
         get() {
           return this[privatePropertySet].rightChild;
+        },
+        set(v) {
+          this[privatePropertySet].rightChild = v;
+          v.parent = this;
         },
         enumerable: true
       }
@@ -55,40 +78,38 @@ export class BinarySearchTreeNode {
 
   [computeNodeCount]() {
     let privateSet = this[privatePropertySet];
-    privateSet.nodeCount = (privateSet.leftChild ? privateSet.leftChild.nodeCount : 0) + (privateSet.rightChild ? privateSet.rightChild.nodeCount : 0) + (privateSet.isDelete ? 0 : 1);
-    // console.log(`value[${privateSet.value}] node compute nodeCount: ${privateSet.nodeCount}`);
+    privateSet.nodeCount = (this.leftChild ? this.leftChild.nodeCount : 0) + (this.rightChild ? this.rightChild.nodeCount : 0) + (this.isDelete ? 0 : 1);
+    // console.log(`value[${this.value}] node compute nodeCount: ${this.nodeCount}`);
   }
 
   find(value) {
-    let privateSet = this[privatePropertySet];
-    if (value < privateSet.value) {
-      if (privateSet.leftChild) {
-        return privateSet.leftChild.find(value);
+    if (value < this.value) {
+      if (this.leftChild) {
+        return this.leftChild.find(value);
       }
       else {
         return null;
       }
     }
-    else if (privateSet.value < value) {
-      if (privateSet.rightChild) {
-        return privateSet.rightChild.find(value);
+    else if (this.value < value) {
+      if (this.rightChild) {
+        return this.rightChild.find(value);
       }
       else {
         return null;
       }
     }
     else {
-      return privateSet.isDelete ? null : this;
+      return this.isDelete ? null : this;
     }
   }
   findMin() {
-    let privateSet = this[privatePropertySet];
-    if (privateSet.leftChild && privateSet.leftChild[privatePropertySet].nodeCount > 0) {
-      return privateSet.leftChild.findMin();
+    if (this.leftChild && this.leftChild.nodeCount > 0) {
+      return this.leftChild.findMin();
     }
-    else if (privateSet.isDelete) {
-      if (privateSet.rightChild && privateSet.rightChild[privatePropertySet].nodeCount > 0) {
-        return privateSet.rightChild.findMin();
+    else if (this.isDelete) {
+      if (this.rightChild && this.rightChild.nodeCount > 0) {
+        return this.rightChild.findMin();
       }
       else {
         return null;
@@ -99,13 +120,12 @@ export class BinarySearchTreeNode {
     }
   }
   findMax() {
-    let privateSet = this[privatePropertySet];
-    if (privateSet.rightChild && privateSet.rightChild[privatePropertySet].nodeCount > 0) {
-      return privateSet.rightChild.findMax();
+    if (this.rightChild && this.rightChild.nodeCount > 0) {
+      return this.rightChild.findMax();
     }
-    else if (privateSet.isDelete) {
-      if (privateSet.leftChild && privateSet.leftChild[privatePropertySet].nodeCount > 0) {
-        return privateSet.leftChild.findMax();
+    else if (this.isDelete) {
+      if (this.leftChild && this.leftChild.nodeCount > 0) {
+        return this.leftChild.findMax();
       }
       else {
         return null;
@@ -118,28 +138,28 @@ export class BinarySearchTreeNode {
   insert(value) {
     let insertResult = false, trulyInsert = false;
     let privateSet = this[privatePropertySet];
-    if (value < privateSet.value) {
-      if (privateSet.leftChild) {
-        ({ insertResult, trulyInsert } = privateSet.leftChild.insert(value));
+    if (value < this.value) {
+      if (this.leftChild) {
+        ({ insertResult, trulyInsert } = this.leftChild.insert(value));
       }
       else {
-        privateSet.leftChild = new this.constructor(value);
+        this.leftChild = new this.constructor(value);
         insertResult = true;
         trulyInsert = true;
       }
     }
-    else if (privateSet.value < value) {
-      if (privateSet.rightChild) {
-        ({ insertResult, trulyInsert } = privateSet.rightChild.insert(value));
+    else if (this.value < value) {
+      if (this.rightChild) {
+        ({ insertResult, trulyInsert } = this.rightChild.insert(value));
       }
       else {
-        privateSet.rightChild = new this.constructor(value);
+        this.rightChild = new this.constructor(value);
         insertResult = true;
         trulyInsert = true;
       }
     }
     else {
-      if (privateSet.isDelete) {
+      if (this.isDelete) {
         privateSet.isDelete = false;
         insertResult = true;
       }
@@ -152,26 +172,26 @@ export class BinarySearchTreeNode {
   delete(value) {
     let deleteResult = false, trulyDelete = false;
     let privateSet = this[privatePropertySet];
-    if (value < privateSet.value) {
-      if (privateSet.leftChild) {
-        ({ deleteResult, trulyDelete } = privateSet.leftChild.delete(value));
+    if (value < this.value) {
+      if (this.leftChild) {
+        ({ deleteResult, trulyDelete } = this.leftChild.delete(value));
         if (deleteResult) {
           //lazy delete
-          if (privateSet.leftChild[privatePropertySet].nodeCount === 0) {
-            privateSet.leftChild = null;
+          if (this.leftChild.nodeCount === 0) {
+            this.leftChild = null;
             trulyDelete = true;
             // console.log(`value[${this.value}] truly delete leftChild`);
           }
         }
       }
     }
-    else if (privateSet.value < value) {
-      if (privateSet.rightChild) {
-        ({ deleteResult, trulyDelete } = privateSet.rightChild.delete(value));
+    else if (this.value < value) {
+      if (this.rightChild) {
+        ({ deleteResult, trulyDelete } = this.rightChild.delete(value));
         if (deleteResult) {
           //lazy delete
-          if (privateSet.rightChild[privatePropertySet].nodeCount === 0) {
-            privateSet.rightChild = null;
+          if (this.rightChild.nodeCount === 0) {
+            this.rightChild = null;
             trulyDelete = true;
             // console.log(`value[${this.value}] truly delete rightChild`);
           }
@@ -179,7 +199,7 @@ export class BinarySearchTreeNode {
       }
     }
     else {
-      if (!privateSet.isDelete) {
+      if (!this.isDelete) {
         privateSet.isDelete = true;
         deleteResult = true;
       }
@@ -202,8 +222,8 @@ export class BinarySearchTreeNode {
     new_root_right[computeNodeCount]();
 
     privateSet.value = origin_root_left.value;
-    privateSet.leftChild = (!origin_root_left.leftChild || origin_root_left.leftChild.nodeCount === 0) ? null : origin_root_left.leftChild;
-    privateSet.rightChild = (!new_root_right || new_root_right.nodeCount === 0) ? null : new_root_right;
+    this.leftChild = (!origin_root_left.leftChild || origin_root_left.leftChild.nodeCount === 0) ? null : origin_root_left.leftChild;
+    this.rightChild = (!new_root_right || new_root_right.nodeCount === 0) ? null : new_root_right;
     privateSet.isDelete = origin_root_left.isDelete;
     this[computeNodeCount]();
   }
@@ -220,8 +240,8 @@ export class BinarySearchTreeNode {
     new_root_left[computeNodeCount]();
 
     privateSet.value = origin_root_right.value;
-    privateSet.leftChild = (!new_root_left || new_root_left.nodeCount === 0) ? null : new_root_left;
-    privateSet.rightChild = (!origin_root_right.rightChild || origin_root_right.rightChild.nodeCount === 0) ? null : origin_root_right.rightChild;
+    this.leftChild = (!new_root_left || new_root_left.nodeCount === 0) ? null : new_root_left;
+    this.rightChild = (!origin_root_right.rightChild || origin_root_right.rightChild.nodeCount === 0) ? null : origin_root_right.rightChild;
     privateSet.isDelete = origin_root_right.isDelete;
     this[computeNodeCount]();
   }
