@@ -15,7 +15,7 @@ const privatePropertySet = Symbol('privatePropertySet');
 const checkBlackHeight = Symbol('checkBlackHeight');
 const computeBlackHeight = Symbol('computeBlackHeight');
 
-const EnumColor = {
+export const EnumColor = {
   red: 1,
   black: 2
 };
