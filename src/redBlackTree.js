@@ -90,26 +90,15 @@ export class RedBlackTreeNode extends BinarySearchTreeNode {
   insert(value) {
     let { insertResult, trulyInsert } = super.insert(value);
     if (trulyInsert) {
-      if (this.parent) {
-        //在父节点上做平衡处理
-        this.parent.balanceAfterInsert();
-      }
-      else {
-        //没有父节点说明this就是根节点，必为黑色，则将黑高度大的子节点直接涂成红色
-        if (this.leftChildBlackHeight > this.rightChildBlackHeight) {
-          this.leftChild.color = EnumColor.red;
-        }
-        else if (this.leftChildBlackHeight < this.rightChildBlackHeight) {
-          this.rightChild.color = EnumColor.red;
-        }
-      }
+      //做平衡处理
+      this.balanceAfterInsert();
     }
     return { insertResult, trulyInsert };
   }
   delete(value) {
     let { deleteResult, trulyDelete } = super.delete(value);
     if (trulyDelete) {
-      //在父节点上做平衡处理
+      //做平衡处理
       this.balanceAfterDelete();
     }
     return { deleteResult, trulyDelete };
@@ -118,122 +107,157 @@ export class RedBlackTreeNode extends BinarySearchTreeNode {
     if (this.leftChildBlackHeight > this.rightChildBlackHeight) {
       //左子节点的黑高度大
       if (this.leftChild.leftChildBlackHeight > this.leftChild.rightChildBlackHeight) {
-        //左孙节点的黑高度大
-        if (this.leftChild.color === EnumColor.black) {
-          //左子节点如果是黑的，则左孙节点直接涂成红色
+        //左孙节点的黑高度大。左子节点此时必是红的，进行如下判断
+        if (this.rightChild && this.rightChild.color === EnumColor.red) {
+          //右子节点存在且为红色
+          //变色
           this.leftChild.leftChild.color = EnumColor.red;
+          this.leftChild.color = EnumColor.black;
+          this.rightChild.color = EnumColor.black;
+          //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
         }
         else {
-          //左子节点如果是红的，则进行如下判断
-          if (this.rightChild) {
-            //右子节点存在，如果存在，在不平衡的情况下必为红的
-            //变色
-            this.leftChild.leftChild.color = EnumColor.red;
-            this.leftChild.color = EnumColor.black;
-            this.rightChild.color = EnumColor.black;
-            //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
-          }
-          else {
-            //右子节点不存在
-            //旋转
-            this.clockwiseRotate();
-            //变色
-            this.color = EnumColor.black;
-            this.leftChild.color = EnumColor.red;
-            this.rightChild.color = EnumColor.red;
-          }
+          //右子节点不存在
+          //旋转
+          this.clockwiseRotate();
+          //变色
+          this.color = EnumColor.black;
+          this.leftChild.color = EnumColor.red;
+          this.rightChild.color = EnumColor.red;
         }
       }
       else if (this.leftChild.leftChildBlackHeight < this.leftChild.rightChildBlackHeight) {
-        //右孙节点的黑高度大
-        if (this.leftChild.color === EnumColor.black) {
-          //左子节点如果是黑的，则右孙节点直接涂成红色
+        //右孙节点的黑高度大。左子节点此时必是红的，进行如下判断
+        if (this.rightChild && this.rightChild.color === EnumColor.red) {
+          //右子节点存在且为红色
+          //变色
           this.leftChild.rightChild.color = EnumColor.red;
+          this.leftChild.color = EnumColor.black;
+          this.rightChild.color = EnumColor.black;
+          //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
         }
         else {
-          //左子节点如果是红的，则进行如下判断
-          if (this.rightChild) {
-            //右子节点存在，如果存在，在不平衡的情况下必为红的
-            //变色
-            this.leftChild.rightChild.color = EnumColor.red;
-            this.leftChild.color = EnumColor.black;
-            this.rightChild.color = EnumColor.black;
-            //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
-          }
-          else {
-            //右子节点不存在
-            //旋转
-            this.leftChild.anticlockwiseRotate();
-            this.clockwiseRotate();
-            //变色
-            this.color = EnumColor.black;
-            this.leftChild.color = EnumColor.red;
-            this.rightChild.color = EnumColor.red;
-          }
+          //右子节点不存在
+          //旋转
+          this.leftChild.anticlockwiseRotate();
+          this.clockwiseRotate();
+          //变色
+          this.color = EnumColor.black;
+          this.leftChild.color = EnumColor.red;
+          this.rightChild.color = EnumColor.red;
+        }
+      }
+      else {
+        if (this.color === EnumColor.black) {
+          //当前节点如果是黑的，则左子节点直接涂成红色
+          this.leftChild.color = EnumColor.red;
         }
       }
     }
     else if (this.leftChildBlackHeight < this.rightChildBlackHeight) {
       //右子节点的黑高度大
       if (this.rightChild.leftChildBlackHeight > this.rightChild.rightChildBlackHeight) {
-        //左孙节点的黑高度大
-        if (this.rightChild.color === EnumColor.black) {
-          //右子节点如果是黑的，则左孙节点直接涂成红色
+        //左孙节点的黑高度大。右子节点此时必是红的，进行如下判断
+        if (this.leftChild && this.leftChild.color === EnumColor.red) {
+          //左子节点存在且为红色
+          //变色
           this.rightChild.leftChild.color = EnumColor.red;
+          this.leftChild.color = EnumColor.black;
+          this.rightChild.color = EnumColor.black;
+          //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
         }
         else {
-          //右子节点如果是红的，则进行如下判断
-          if (this.leftChild) {
-            //左子节点存在，如果存在，在不平衡的情况下必为红的
-            //变色
-            this.rightChild.leftChild.color = EnumColor.red;
-            this.leftChild.color = EnumColor.black;
-            this.rightChild.color = EnumColor.black;
-            //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
-          }
-          else {
-            //左子节点不存在
-            //旋转
-            this.rightChild.clockwiseRotate();
-            this.anticlockwiseRotate();
-            //变色
-            this.color = EnumColor.black;
-            this.leftChild.color = EnumColor.red;
-            this.rightChild.color = EnumColor.red;
-          }
+          //左子节点不存在
+          //旋转
+          this.rightChild.clockwiseRotate();
+          this.anticlockwiseRotate();
+          //变色
+          this.color = EnumColor.black;
+          this.leftChild.color = EnumColor.red;
+          this.rightChild.color = EnumColor.red;
         }
       }
       else if (this.rightChild.leftChildBlackHeight < this.rightChild.rightChildBlackHeight) {
-        //右孙节点的黑高度大
-        if (this.rightChild.color === EnumColor.black) {
-          //右子节点如果是黑的，则右孙节点直接涂成红色
+        //右孙节点的黑高度大。右子节点此时必是红的，进行如下判断
+        if (this.leftChild && this.leftChild.color === EnumColor.red) {
+          //左子节点存在且为红色
+          //变色
           this.rightChild.rightChild.color = EnumColor.red;
+          this.leftChild.color = EnumColor.black;
+          this.rightChild.color = EnumColor.black;
+          //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
         }
         else {
-          //右子节点如果是红的，则进行如下判断
-          if (this.leftChild) {
-            //左子节点存在，如果存在，在不平衡的情况下必为红的
-            //变色
-            this.rightChild.rightChild.color = EnumColor.red;
-            this.leftChild.color = EnumColor.black;
-            this.rightChild.color = EnumColor.black;
-            //变色之后当前整个子树的黑高度都一致了，但是比原来增加了1，因此递归到上一级父节点的时候会继续再平衡处理
-          }
-          else {
-            //左子节点不存在
-            //旋转
-            this.anticlockwiseRotate();
-            //变色
-            this.color = EnumColor.black;
-            this.leftChild.color = EnumColor.red;
-            this.rightChild.color = EnumColor.red;
-          }
+          //左子节点不存在
+          //旋转
+          this.anticlockwiseRotate();
+          //变色
+          this.color = EnumColor.black;
+          this.leftChild.color = EnumColor.red;
+          this.rightChild.color = EnumColor.red;
+        }
+      }
+      else {
+        if (this.color === EnumColor.black) {
+          //当前节点如果是黑的，则右子节点直接涂成红色
+          this.rightChild.color = EnumColor.red;
         }
       }
     }
   }
   balanceAfterDelete() {
-    if (this.leftChildBlackHeight > this.rightChildBlackHeight) {}
+    if (this.leftChildBlackHeight > this.rightChildBlackHeight) {
+      //左子节点的黑高度大
+      if (this.leftChild.color === EnumColor.red) {
+        //左子节点如果是红的
+        //旋转
+        this.clockwiseRotate();
+        //变色
+        this.color = EnumColor.black;
+        this.rightChild.color = EnumColor.red;
+        //此时右子节点转换成了同级别的左子节点是黑色的处理情况，调用右子节点的平衡处理
+        this.rightChild.balanceAfterDelete();
+      }
+      else {
+        //左子节点如果是黑的
+        if (this.leftChild.leftChild && this.leftChild.leftChild.color === EnumColor.red) {
+          //左孙节点不为空且为红色
+          let rootOriginColor = this.color;
+          //旋转
+          this.clockwiseRotate();
+          //变色
+          this.color = rootOriginColor;
+          this.leftChild.color = EnumColor.black;
+          this.rightChild.color = EnumColor.black;
+        }
+        else if (this.leftChild.rightChild && this.leftChild.rightChild.color === EnumColor.red) {
+          //右孙节点不为空且为红色
+          let rootOriginColor = this.color;
+          //旋转
+          this.leftChild.anticlockwiseRotate();
+          this.clockwiseRotate();
+          //变色
+          this.color = rootOriginColor;
+          this.leftChild.color = EnumColor.black;
+          this.rightChild.color = EnumColor.black;
+        }
+        else {
+          //左右孙节点都为空或者都为黑色
+          if (this.color === EnumColor.red) {
+            //自身节点是红色
+            //变色
+            this.color = EnumColor.black;
+            this.leftChild.color = EnumColor.red;
+          }
+          else {
+            //自身节点是黑色
+            //变色
+            this.leftChild.color = EnumColor.red;
+            //变色之后当前整个子树的黑高度都一致了，但是比原来减少了1，因此递归到上一级父节点的时候会继续再平衡处理
+          }
+        }
+      }
+    }
     else if (this.leftChildBlackHeight < this.rightChildBlackHeight) {
       //右子节点的黑高度大
       if (this.rightChild.color === EnumColor.red) {
@@ -242,13 +266,14 @@ export class RedBlackTreeNode extends BinarySearchTreeNode {
         this.anticlockwiseRotate();
         //变色
         this.color = EnumColor.black;
-        this.leftChild.color = EnumColor.black;
-        this.leftChild.rightChild.color = EnumColor.red;
+        this.leftChild.color = EnumColor.red;
+        //此时左子节点转换成了同级别的右子节点是黑色的处理情况，调用左子节点的平衡处理
+        this.leftChild.balanceAfterDelete();
       }
       else {
         //右子节点如果是黑的
-        if (this.rightChild.leftChild) {
-          //左孙节点不为空
+        if (this.rightChild.leftChild && this.rightChild.leftChild.color === EnumColor.red) {
+          //左孙节点不为空且为红色
           let rootOriginColor = this.color;
           //旋转
           this.rightChild.clockwiseRotate();
@@ -258,8 +283,8 @@ export class RedBlackTreeNode extends BinarySearchTreeNode {
           this.leftChild.color = EnumColor.black;
           this.rightChild.color = EnumColor.black;
         }
-        else if (this.rightChild.rightChild) {
-          //右孙节点不为空
+        else if (this.rightChild.rightChild && this.rightChild.rightChild.color === EnumColor.red) {
+          //右孙节点不为空且为红色
           let rootOriginColor = this.color;
           //旋转
           this.anticlockwiseRotate();
@@ -269,7 +294,7 @@ export class RedBlackTreeNode extends BinarySearchTreeNode {
           this.rightChild.color = EnumColor.black;
         }
         else {
-          //左右孙节点都为空
+          //左右孙节点都为空或者都为黑色
           if (this.color === EnumColor.red) {
             //自身节点是红色
             //变色
@@ -279,7 +304,8 @@ export class RedBlackTreeNode extends BinarySearchTreeNode {
           else {
             //自身节点是黑色
             //变色
-            this.rightChild.color = EnumColor.red;//TODO:
+            this.rightChild.color = EnumColor.red;
+            //变色之后当前整个子树的黑高度都一致了，但是比原来减少了1，因此递归到上一级父节点的时候会继续再平衡处理
           }
         }
       }
