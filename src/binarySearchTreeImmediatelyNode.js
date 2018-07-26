@@ -156,13 +156,15 @@ export class BinarySearchTreeNode {
         ({ deleteResult, trulyDelete } = this.leftChild.delete(replaceNode.value));
       }
       else {
-        if (this.parent.rightChild && this.value === this.parent.rightChild.value) {
-          this.parent.rightChild = null;
+        if (this.parent) {
+          if (this.parent.rightChild && this.value === this.parent.rightChild.value) {
+            this.parent.rightChild = null;
+          }
+          else if (this.parent.leftChild && this.value === this.parent.leftChild.value) {
+            this.parent.leftChild = null;
+          }
+          this.parent = null;
         }
-        else if (this.parent.leftChild && this.value === this.parent.leftChild.value) {
-          this.parent.leftChild = null;
-        }
-        this.parent = null;
         deleteResult = true;
         trulyDelete = true;
       }

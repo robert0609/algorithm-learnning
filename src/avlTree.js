@@ -85,9 +85,14 @@ export function run() {
 
 
   let avl = new AVLTree([4,1,6,2,5,7]);
-  let jsonTree = JSON.stringify(avl.tree);
-  console.log(jsonTree);
 
   avl.insert(3);
+  avl.delete(1);
+  avl.delete(2);
+  avl.delete(3);
+  avl.delete(4);
+  avl.delete(5);
+  avl.delete(6);
+  avl.delete(7);
   console.log(JSON.stringify(avl.tree));
 }
