@@ -150,8 +150,8 @@ export class SplayTreeNode {
     if (leftRootNode && rightRootNode) {
       //将左子树拆分出来
       nodeToDelete.leftChild = null;
-      leftRootNode.parent = null;
-      leftRootNode.sideOfParent = null;
+      leftRootNode[privatePropertySet].parent = null;
+      leftRootNode[privatePropertySet].sideOfParent = null;
       //找到左子树的最大节点，并伸展到根部
       let newLeftRootNode = leftRootNode.findMax();
       //合并两个子树

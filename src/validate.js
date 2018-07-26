@@ -86,11 +86,24 @@ export function validateRedBlackTree(tree) {
   }
 }
 
-export function validateSplayTree(tree, operationValue) {
+export function validateSplayTree(tree, operationValue = null) {
   validateBinarySearchTree(tree);
   let rootNode = tree.tree;
   //校验操作的节点值已经被伸展到根节点
-  if (rootNode.value !== operationValue) {
+  if (operationValue && rootNode.value !== operationValue) {
     throw new Error(`访问的节点${operationValue}没有伸展到根部`);
+  }
+  let values = [];
+  loopNode(rootNode);
+  console.log(`后序遍历：[${values}]; 伸展树性质校验成功`);
+
+  function loopNode(node) {
+    if (node.leftChild) {
+      loopNode(node.leftChild);
+    }
+    if (node.rightChild) {
+      loopNode(node.rightChild);
+    }
+    values.push(node.value);
   }
 }

@@ -60,7 +60,7 @@ export class SplayTree {
     values.forEach(value => {
       let result = this[privatePropertySet].tree.delete(value);
       console.log(`移除${value}`);
-      validateSplayTree(this, value);
+      validateSplayTree(this);
       return result;
     });
   }
