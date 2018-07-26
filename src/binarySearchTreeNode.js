@@ -54,7 +54,7 @@ export class BinarySearchTreeNode {
         set(v) {
           this[privatePropertySet].parent = v;
         },
-        enumerable: true
+        enumerable: false
       },
       leftChild: {
         get() {

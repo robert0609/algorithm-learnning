@@ -10,7 +10,8 @@ import 'babel-polyfill';
 // import { run } from './avlTree';
 // import { run } from './binaryFullTree';
 // import { run } from './quickSort';
-import { run } from './graphic';
+// import { run } from './graphic';
+import { run } from './redBlackTree';
 
 /**
  * 入口函数

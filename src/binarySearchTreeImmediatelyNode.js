@@ -42,7 +42,7 @@ export class BinarySearchTreeNode {
         set(v) {
           this[privatePropertySet].parent = v;
         },
-        enumerable: true
+        enumerable: false
       },
       leftChild: {
         get() {
@@ -156,10 +156,10 @@ export class BinarySearchTreeNode {
         ({ deleteResult, trulyDelete } = this.leftChild.delete(replaceNode.value));
       }
       else {
-        if (this.value > this.parent.value) {
+        if (this.parent.rightChild && this.value === this.parent.rightChild.value) {
           this.parent.rightChild = null;
         }
-        else {
+        else if (this.parent.leftChild && this.value === this.parent.leftChild.value) {
           this.parent.leftChild = null;
         }
         this.parent = null;
