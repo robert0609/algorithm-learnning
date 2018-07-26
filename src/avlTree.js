@@ -64,50 +64,32 @@ export class AVLTree {
 }
 
 export function run() {
-  // let avl = new AVLTree([5,2,1,4,3,9,8,6,7]);
-  // let jsonTree = JSON.stringify(avl.tree);
-  // console.log(jsonTree);
-  // console.log(`max: ${avl.max}`);
-  // console.log(`min: ${avl.min}`);
-  // console.log(`find 2: ${avl.find(2)}`);
-  // console.log(`find 12: ${avl.find(12)}`);
-  // console.log(`find 6: ${avl.find(6)}`);
-
-  // avl.delete(8);
-  // avl.delete(6);
-  // avl.delete(7);
-  // avl.delete(1);
-  // avl.delete(4);
-  // avl.delete(3);
-  // avl.delete(5);
-  // avl.insert(7);
-  // avl.insert(5);
-  // // avl.delete(2);
-  // // avl.delete(9);
-  // // avl.delete(12);
-  // // avl.insert(6);
-  // // avl.insert(12);
-  // // avl.insert(2);
-  // // avl.insert(20);
-  // console.log(JSON.stringify(avl.tree));
-
-  // console.log(`max: ${avl.max}`);
-  // console.log(`min: ${avl.min}`);
-  // console.log(`find 2: ${avl.find(2)}`);
-  // console.log(`find 12: ${avl.find(12)}`);
-  // console.log(`find 6: ${avl.find(6)}`);
-
-
-  let avl = new AVLTree([4,1,6,2,5,7]);
-
-  avl.insert(3);
-  avl.delete(1);
-  avl.delete(2);
-  console.log(JSON.stringify(avl.tree));
-  avl.delete(3);
-  avl.delete(4);
-  avl.delete(5);
+  let avl = new AVLTree([7,3,10,2,5,8,13,1,4,9,11,14,12,6]);
+  console.log(`max: ${avl.max}`);
+  console.log(`min: ${avl.min}`);
+  console.log(`find 2: ${avl.find(2)}`);
+  console.log(`find 12: ${avl.find(12)}`);
+  console.log(`find 6: ${avl.find(6)}`);
+  avl.delete(1, 2);
+  avl.delete(8);
   avl.delete(6);
   avl.delete(7);
+  avl.delete(4);
+  avl.delete(3);
+  avl.delete(5);
+  avl.insert(7);
+  avl.insert(5);
+  avl.delete(9);
+  avl.delete(12);
+  avl.insert(6);
+  avl.insert(12);
+  avl.insert(2);
+  avl.insert(20);
+
+  console.log(`max: ${avl.max}`);
+  console.log(`min: ${avl.min}`);
+  console.log(`find 2: ${avl.find(2)}`);
+  console.log(`find 12: ${avl.find(12)}`);
+  console.log(`find 6: ${avl.find(6)}`);
   console.log(JSON.stringify(avl.tree));
 }

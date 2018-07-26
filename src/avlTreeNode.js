@@ -72,7 +72,7 @@ export class AVLTreeNode extends BinarySearchTreeNode {
   balance() {
     if (this.leftChildHeight - this.rightChildHeight > 1) {
       // console.log(`value[${this.value}] node fix balance`);
-      if (this.leftChild.leftChildHeight > this.leftChild.rightChildHeight) {
+      if (this.leftChild.leftChildHeight >= this.leftChild.rightChildHeight) {
         this.clockwiseRotate();
       }
       else if (this.leftChild.leftChildHeight < this.leftChild.rightChildHeight) {
@@ -82,7 +82,7 @@ export class AVLTreeNode extends BinarySearchTreeNode {
     }
     else if (this.rightChildHeight - this.leftChildHeight > 1) {
       // console.log(`value[${this.value}] node fix balance`);
-      if (this.rightChild.rightChildHeight > this.rightChild.leftChildHeight) {
+      if (this.rightChild.rightChildHeight >= this.rightChild.leftChildHeight) {
         this.anticlockwiseRotate();
       }
       else if (this.rightChild.rightChildHeight < this.rightChild.leftChildHeight) {
