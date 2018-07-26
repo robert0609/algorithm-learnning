@@ -29,6 +29,28 @@ export function validateBinarySearchTree(tree) {
   }
 }
 
+export function validateAVLTree(tree) {
+  validateBinarySearchTree(tree);
+  let rootNode = tree.tree;
+  //校验每个节点左右子树的高度差不大于1
+  let values = [];
+  loopNode(rootNode);
+  console.log(`后序遍历：[${values}]; AVL树性质校验成功`);
+
+  function loopNode(node) {
+    if (node.leftChild) {
+      loopNode(node.leftChild);
+    }
+    if (node.rightChild) {
+      loopNode(node.rightChild);
+    }
+    values.push(node.value);
+    if (Math.abs(node.leftChildHeight - node.rightChildHeight) > 1) {
+      throw new Error(`节点${node.value}的左子树的高度${node.leftChildHeight}与右子树的高度${node.rightChildHeight}差值大于1`);
+    }
+  }
+}
+
 export function validateRedBlackTree(tree) {
   validateBinarySearchTree(tree);
   let rootNode = tree.tree;

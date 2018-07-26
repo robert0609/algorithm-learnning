@@ -1,4 +1,5 @@
 import { AVLTreeNode } from './avlTreeNode';
+import { validateAVLTree } from './validate';
 
 const privatePropertySet = Symbol('privatePropertySet');
 
@@ -7,16 +8,6 @@ export class AVLTree {
     this[privatePropertySet] = {
       tree: null
     };
-    if (valueList.length > 0) {
-      for (let i = 0; i < valueList.length; ++i) {
-        if (this[privatePropertySet].tree) {
-          this[privatePropertySet].tree.insert(valueList[i]);
-        }
-        else {
-          this[privatePropertySet].tree = new AVLTreeNode(valueList[i]);
-        }
-      }
-    }
 
     Object.defineProperty(this, 'tree', {
       get() {
@@ -24,6 +15,19 @@ export class AVLTree {
       },
       enumerable: true
     });
+
+    if (valueList.length > 0) {
+      for (let i = 0; i < valueList.length; ++i) {
+        if (this.tree) {
+          this.insert(valueList[i]);
+        }
+        else {
+          this[privatePropertySet].tree = new AVLTreeNode(valueList[i]);
+          validateAVLTree(this);
+        }
+      }
+    }
+
   }
 
   get max() {
@@ -40,12 +44,22 @@ export class AVLTree {
     return e ? e.value : null;
   }
 
-  insert(value) {
-    return this[privatePropertySet].tree.insert(value);
+  insert(...values) {
+    values.forEach(value => {
+      let result = this[privatePropertySet].tree.insert(value);
+      console.log(`插入${value}`);
+      validateAVLTree(this);
+      return result;
+    });
   }
 
-  delete(value) {
-    return this[privatePropertySet].tree.delete(value);
+  delete(...values) {
+    values.forEach(value => {
+      let result = this[privatePropertySet].tree.delete(value);
+      console.log(`移除${value}`);
+      validateAVLTree(this);
+      return result;
+    });
   }
 }
 
@@ -89,6 +103,7 @@ export function run() {
   avl.insert(3);
   avl.delete(1);
   avl.delete(2);
+  console.log(JSON.stringify(avl.tree));
   avl.delete(3);
   avl.delete(4);
   avl.delete(5);
