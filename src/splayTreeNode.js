@@ -96,39 +96,119 @@ export class SplayTreeNode {
       }
     }
     else {
-      return this;
+      //找到之后，将本节点伸展到根结点，然后返回
+      return this.splay();
     }
   }
-  findMin() {}
-  findMax() {}
-  insert(value) {}
-  delete(value) {}
+  findMin() {
+    if (this.leftChild) {
+      return this.leftChild.findMin();
+    }
+    else {
+      return this.splay();
+    }
+  }
+  findMax() {
+    if (this.rightChild) {
+      return this.rightChild.findMax();
+    }
+    else {
+      return this.splay();
+    }
+  }
+  insert(value) {
+    let insertResult = false, trulyInsert = false;
+    if (value < this.value) {
+      if (this.leftChild) {
+        ({ insertResult, trulyInsert } = this.leftChild.insert(value));
+      }
+      else {
+        this.leftChild = new this.constructor(value);
+        insertResult = true;
+        trulyInsert = true;
+        this.leftChild.splay();
+      }
+    }
+    else if (this.value < value) {
+      if (this.rightChild) {
+        ({ insertResult, trulyInsert } = this.rightChild.insert(value));
+      }
+      else {
+        this.rightChild = new this.constructor(value);
+        insertResult = true;
+        trulyInsert = true;
+        this.rightChild.splay();
+      }
+    }
+    return { insertResult, trulyInsert };
+  }
+  delete(value) {
+    let nodeToDelete = this.find(value);
+    let privateSet = nodeToDelete[privatePropertySet];
+    let leftRootNode = nodeToDelete.leftChild;
+    let rightRootNode = nodeToDelete.rightChild;
+    if (leftRootNode && rightRootNode) {
+      //将左子树拆分出来
+      nodeToDelete.leftChild = null;
+      leftRootNode.parent = null;
+      leftRootNode.sideOfParent = null;
+      //找到左子树的最大节点，并伸展到根部
+      let newLeftRootNode = leftRootNode.findMax();
+      //合并两个子树
+      privateSet.value = newLeftRootNode.value;
+      nodeToDelete.leftChild = newLeftRootNode.leftChild;
+    }
+    else if (!leftRootNode) {
+      privateSet.value = rightRootNode.value;
+      nodeToDelete.leftChild = rightRootNode.leftChild;
+      nodeToDelete.rightChild = rightRootNode.rightChild;
+    }
+    else {
+      privateSet.value = leftRootNode.value;
+      nodeToDelete.leftChild = leftRootNode.leftChild;
+      nodeToDelete.rightChild = leftRootNode.rightChild;
+    }
+  }
   splay() {
     let father = this.parent;
     if (!father) {
-      return;
+      return this;
     }
     let grandfather = father.parent;
     if (!grandfather) {
       if (this.sideOfParent === EnumSide.left) {
-        this.parent.clockwiseRotate();
+        father.clockwiseRotate();
       }
       else {
-        this.parent.anticlockwiseRotate();
+        father.anticlockwiseRotate();
+      }
+      return father;
+    }
+    if (this.sideOfParent === father.sideOfParent) {
+      if (this.sideOfParent === EnumSide.left) {
+        //LL
+        grandfather.clockwiseRotate();
+        grandfather.clockwiseRotate();
+      }
+      else {
+        //RR
+        grandfather.anticlockwiseRotate();
+        grandfather.anticlockwiseRotate();
       }
     }
     else {
-      if (this.sideOfParent === this.parent.sideOfParent) {
-        if (this.sideOfParent === EnumSide.left) {
-          //LL
-          this.parent.parent.clockwiseRotate();
-        }
-        else {
-          //RR
-        }
+      if (this.sideOfParent === EnumSide.left) {
+        //LR
+        father.clockwiseRotate();
+        grandfather.anticlockwiseRotate();
       }
-      else {}
+      else {
+        //RL
+        father.anticlockwiseRotate();
+        grandfather.clockwiseRotate();
+      }
     }
+    return grandfather.splay();
   }
   clockwiseRotate() {
     let privateSet = this[privatePropertySet];
