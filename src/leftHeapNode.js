@@ -119,7 +119,7 @@ export class LeftHeapNode {
   }
   swapLeftRight() {
     if (this.leftChildNpl < this.rightChildNpl) {
-      ([ this.leftChild, this.rightChild ] = [ this.rightChild, this.leftChild ]);//TODO:这里交换左右可能会有问题
+      ([ this.leftChild, this.rightChild ] = [ this.rightChild, this.leftChild ]);
     }
   }
 }
