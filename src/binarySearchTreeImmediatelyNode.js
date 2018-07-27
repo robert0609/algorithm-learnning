@@ -49,6 +49,9 @@ export class BinarySearchTreeNode {
           return this[privatePropertySet].leftChild;
         },
         set(v) {
+          if (this[privatePropertySet].leftChild) {
+            this[privatePropertySet].leftChild.parent = null;
+          }
           this[privatePropertySet].leftChild = v;
           if (v) {
             v.parent = this;
@@ -61,6 +64,9 @@ export class BinarySearchTreeNode {
           return this[privatePropertySet].rightChild;
         },
         set(v) {
+          if (this[privatePropertySet].rightChild) {
+            this[privatePropertySet].rightChild.parent = null;
+          }
           this[privatePropertySet].rightChild = v;
           if (v) {
             v.parent = this;

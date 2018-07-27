@@ -47,6 +47,10 @@ export class SplayTreeNode {
           return this[privatePropertySet].leftChild;
         },
         set(v) {
+          if (this[privatePropertySet].leftChild) {
+            this[privatePropertySet].leftChild[privatePropertySet].parent = null;
+            this[privatePropertySet].leftChild[privatePropertySet].sideOfParent = null;
+          }
           this[privatePropertySet].leftChild = v;
           if (v) {
             v[privatePropertySet].parent = this;
@@ -60,6 +64,10 @@ export class SplayTreeNode {
           return this[privatePropertySet].rightChild;
         },
         set(v) {
+          if (this[privatePropertySet].rightChild) {
+            this[privatePropertySet].rightChild[privatePropertySet].parent = null;
+            this[privatePropertySet].rightChild[privatePropertySet].sideOfParent = null;
+          }
           this[privatePropertySet].rightChild = v;
           if (v) {
             v[privatePropertySet].parent = this;
