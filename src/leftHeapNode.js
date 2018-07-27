@@ -80,6 +80,23 @@ export class LeftHeapNode {
     }
   }
 
+  get leftChildNpl() {
+    if (this.leftChild) {
+      return this.leftChild.npl;
+    }
+    else {
+      return -1;
+    }
+  }
+  get rightChildNpl() {
+    if (this.rightChild) {
+      return this.rightChild.npl;
+    }
+    else {
+      return -1;
+    }
+  }
+
   /**
    * 合并两个左式堆的操作，返回新的左式堆的根节点
    */
@@ -103,11 +120,11 @@ export class LeftHeapNode {
       hostNode.rightChild = targetNode;
     }
     hostNode.swapLeftRight();
-    hostNode[privatePropertySet].npl = Math.min(hostNode.leftChild.npl, hostNode.rightChild.npl) + 1;
+    hostNode[privatePropertySet].npl = Math.min(hostNode.leftChildNpl, hostNode.rightChildNpl) + 1;
     return hostNode;
   }
   swapLeftRight() {
-    if (this.leftChild.npl < this.rightChild.npl) {
+    if (this.leftChildNpl < this.rightChildNpl) {
       ([ this.leftChild, this.rightChild ] = [ this.rightChild, this.leftChild ]);//TODO:这里交换左右可能会有问题
     }
   }

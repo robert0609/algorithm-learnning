@@ -50,14 +50,14 @@ export class LeftHeap {
 
 export function run() {
   let heap = new LeftHeap();
-  heap.push([5,1,65,4,9,8,17]);
+  heap.push(5,1,65,4,9,8,17);
   heap.findMin();
   heap.popMin();
   heap.findMin();
   heap.popMin();
   heap.findMin();
   heap.popMin();
-  heap.push([4,10,5,1,36]);
+  heap.push(4,10,5,1,36);
   heap.findMin();
   heap.popMin();
   heap.findMin();

@@ -54,7 +54,7 @@ export function validateAVLTree(tree) {
         h = computeHeight(node.rightChild) + 1;
       }
       else {
-        h = 0
+        h = 0;
       }
       heightDic[node.value] = h;
     }
