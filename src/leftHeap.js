@@ -1,16 +1,65 @@
-/**
- * 零路径长(null path length)定义：任一节点到一个没有两个儿子的节点的最短路径的长
- * 左式堆性质：堆中每一个节点，左儿子的npl不小于右儿子的npl
- */
+import { LeftHeapNode } from './leftHeapNode';
+import { validateLeftHeap } from './validate';
+
 const privatePropertySet = Symbol('privatePropertySet');
 
-function parameterCanNotBeNull(name) {
-  throw new Error(`${name} can not be null!`);
+export class LeftHeap {
+  constructor() {
+    this[privatePropertySet] = {
+      root: null
+    };
+
+    Object.defineProperty(this, 'root', {
+      get() {
+        return this[privatePropertySet].root;
+      },
+      enumerable: true
+    });
+  }
+
+  push(...values) {
+    values.forEach(value => {
+      let node = new LeftHeapNode(value);
+      console.log(`插入${value}`);
+      if (this[privatePropertySet].root) {
+        this[privatePropertySet].root = this[privatePropertySet].root.merge(node);
+      }
+      else {
+        this[privatePropertySet].root = node;
+      }
+      validateLeftHeap(this);
+    });
+  }
+  findMin() {
+    let node = this[privatePropertySet].root;
+    console.log(`最小值${node.value}`);
+    return node.value;
+  }
+  popMin() {
+    let minRoot = this[privatePropertySet].root;
+    let leftChild = minRoot.leftChild;
+    let rightChild = minRoot.rightChild;
+    minRoot.leftChild = null;
+    minRoot.rightChild = null;
+    this[privatePropertySet].root = leftChild.merge(rightChild);
+    console.log(`弹出最小值${minRoot.value}`);
+    validateLeftHeap(this);
+    return minRoot.value;
+  }
 }
 
-export class LeftHeapNode {
-  constructor(value = parameterCanNotBeNull(), {
-    leftChild = null,
-    rightChild = null
-  } = {}) {}
+export function run() {
+  let heap = new LeftHeap();
+  heap.push([5,1,65,4,9,8,17]);
+  heap.findMin();
+  heap.popMin();
+  heap.findMin();
+  heap.popMin();
+  heap.findMin();
+  heap.popMin();
+  heap.push([4,10,5,1,36]);
+  heap.findMin();
+  heap.popMin();
+  heap.findMin();
+  heap.popMin();
 }

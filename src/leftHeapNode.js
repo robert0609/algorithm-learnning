@@ -1,3 +1,7 @@
+/**
+ * 零路径长(null path length)定义：任一节点到一个没有两个儿子的节点的最短路径的长
+ * 左式堆性质：堆中每一个节点，左儿子的npl不小于右儿子的npl
+ */
 const privatePropertySet = Symbol('privatePropertySet');
 
 function parameterCanNotBeNull(name) {
@@ -103,6 +107,8 @@ export class LeftHeapNode {
     return hostNode;
   }
   swapLeftRight() {
-
+    if (this.leftChild.npl < this.rightChild.npl) {
+      ([ this.leftChild, this.rightChild ] = [ this.rightChild, this.leftChild ]);//TODO:这里交换左右可能会有问题
+    }
   }
 }
