@@ -7,13 +7,14 @@ import 'babel-polyfill';
 // import { run } from './minPositiveSumOfChildArray';
 // import { run } from './intersection';
 // import { run } from './binarySearchTree';
-import { run } from './avlTree';
+// import { run } from './avlTree';
 // import { run } from './binaryFullTree';
 // import { run } from './quickSort';
 // import { run } from './graphic';
 // import { run } from './redBlackTree';
 // import { run } from './splayTree';
 // import { run } from './leftHeap';
+import { run } from './binomialQueue';
 
 /**
  * 入口函数

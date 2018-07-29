@@ -270,3 +270,29 @@ export function validateLeftHeap(leftHeap) {
     }
   }
 }
+
+export function validateBinomialQueue(queue) {
+  queue.forest.forEach(node => {
+    if (node) {
+      validateBinomialNode(node);
+    }
+  });
+}
+
+function validateBinomialNode(node) {
+  node.nodeCount = 1;
+  node.forest.forEach(n => {
+    if (n.value <= node.value) {
+      throw new Error(`节点的值${node.value}大于或等于子节点的值${n.value}`);
+    }
+    node.nodeCount += n.nodeCount;
+    validateBinomialNode(n);
+  });
+  if (Math.pow(2, node.index) !== node.nodeCount) {
+    throw new Error(`二项式${node.value}的节点树不正确`);
+  }
+}
+
+function displayBinomialNode(node) {
+
+}

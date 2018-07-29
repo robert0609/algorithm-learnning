@@ -7,7 +7,7 @@ function parameterCanNotBeNull(name) {
 }
 
 export class BinarySearchTreeNode {
-  constructor(value = parameterCanNotBeNull(), {
+  constructor(value = parameterCanNotBeNull('value'), {
     leftChild = null,
     rightChild = null
   } = {}) {

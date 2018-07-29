@@ -25,7 +25,7 @@ function parameterCanNotBeNull(name) {
 }
 
 export class RedBlackTreeNode extends BinarySearchTreeNode {
-  constructor(value = parameterCanNotBeNull(), {
+  constructor(value = parameterCanNotBeNull('value'), {
     leftChild = null,
     rightChild = null
   } = {}) {
