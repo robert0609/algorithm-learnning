@@ -37,17 +37,20 @@ export class BinomialQueue {
       }
       this.forest[j] = mergedNode;
     }
-    validateBinomialQueue(this);
   }
 
   push(...values) {
     values.forEach(value => {
       this.merge(new BinomialQueueNode(value));
     });
+    validateBinomialQueue(this);
   }
   findMin() {
     let result = null;
     this.forest.forEach(node => {
+      if (!node) {
+        return;
+      }
       if (result) {
         if (node.value < result.value) {
           result = node;
@@ -63,6 +66,9 @@ export class BinomialQueue {
   popMin() {
     let min = null;
     this.forest.forEach(node => {
+      if (!node) {
+        return;
+      }
       if (min) {
         if (node.value < min.value) {
           min = node;
@@ -77,6 +83,7 @@ export class BinomialQueue {
     min.forest.forEach(node => {
       this.merge(node);
     });
+    validateBinomialQueue(this);
   }
 }
 
@@ -87,11 +94,11 @@ export function run() {
   heap.popMin();
   heap.findMin();
   heap.popMin();
-  heap.findMin();
-  heap.popMin();
-  heap.push(4,10,5,1,36);
-  heap.findMin();
-  heap.popMin();
-  heap.findMin();
-  heap.popMin();
+  // heap.findMin();
+  // heap.popMin();
+  // heap.push(4,10,5,1,36);
+  // heap.findMin();
+  // heap.popMin();
+  // heap.findMin();
+  // heap.popMin();
 }

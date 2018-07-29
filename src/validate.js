@@ -274,9 +274,24 @@ export function validateLeftHeap(leftHeap) {
 export function validateBinomialQueue(queue) {
   queue.forest.forEach(node => {
     if (node) {
+      let displayMatrix = displayBinomialNode(node);
+      console.log(`k${node.index}:`);
+      let rowLen = displayMatrix[displayMatrix.length - 1].length;
+      let colLen = displayMatrix.length;
+      for (let r = 0; r < rowLen; ++r) {
+        let rowText = [];
+        for (let c = 0; c < colLen; ++c) {
+          let cellContent = displayMatrix[c][r];
+          rowText.push(cellContent ? padLeft(cellContent.toString(), 3) : '   ');
+        }
+        console.log(rowText.join('--'));
+      }
+
       validateBinomialNode(node);
     }
   });
+
+  console.log('二项式队列性质校验成功');
 }
 
 function validateBinomialNode(node) {
@@ -285,40 +300,40 @@ function validateBinomialNode(node) {
     if (n.value <= node.value) {
       throw new Error(`节点的值${node.value}大于或等于子节点的值${n.value}`);
     }
-    node.nodeCount += n.nodeCount;
     validateBinomialNode(n);
+    node.nodeCount += n.nodeCount;
   });
+
   if (Math.pow(2, node.index) !== node.nodeCount) {
     throw new Error(`二项式${node.value}的节点树不正确`);
   }
 }
 
-function displayBinomialNode(node, rowIndex = 0) {
+function displayBinomialNode(node) {
   let result = [];
   if (node.forest.length > 0) {
-
+    node.forest.forEach(n => {
+      let m = displayBinomialNode(n);
+      m.forEach(l => {
+        l.unshift('   ');
+        result.push(l);
+      });
+    });
+    result[0][0] = node.value;
   }
   else {
     result.push([ node.value ]);
   }
   return result;
+}
 
-
-  let rowIndex = 0;
-  let currentRowNodes = [ node ];
-  while (currentRowNodes.length > 0) {
-    let rowValues = [];
-    let startIndex = Math.pow(2, (rowIndex - 1)) - 1;
-    if (startIndex < 0) {
-      startIndex = 0;
+function padLeft(s, n) {
+  let r = s;
+  if (r.length < n) {
+    let nn = n - r.length;
+    for (let i = 0; i < nn; ++i) {
+      r = ' ' + r;
     }
-    let i = 0;
-    while (i < startIndex) {
-      rowValues.push(' ');
-    }
-    rowValues.push(...currentRowNodes.map(n => n.value));
-    console.log(rowValues.join(' '));
-
-    ++rowIndex;
   }
+  return r;
 }
