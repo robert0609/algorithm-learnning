@@ -293,6 +293,32 @@ function validateBinomialNode(node) {
   }
 }
 
-function displayBinomialNode(node) {
+function displayBinomialNode(node, rowIndex = 0) {
+  let result = [];
+  if (node.forest.length > 0) {
 
+  }
+  else {
+    result.push([ node.value ]);
+  }
+  return result;
+
+
+  let rowIndex = 0;
+  let currentRowNodes = [ node ];
+  while (currentRowNodes.length > 0) {
+    let rowValues = [];
+    let startIndex = Math.pow(2, (rowIndex - 1)) - 1;
+    if (startIndex < 0) {
+      startIndex = 0;
+    }
+    let i = 0;
+    while (i < startIndex) {
+      rowValues.push(' ');
+    }
+    rowValues.push(...currentRowNodes.map(n => n.value));
+    console.log(rowValues.join(' '));
+
+    ++rowIndex;
+  }
 }
