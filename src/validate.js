@@ -272,10 +272,11 @@ export function validateLeftHeap(leftHeap) {
 }
 
 export function validateBinomialQueue(queue) {
-  queue.forest.forEach(node => {
+  for (let i = 0; i < queue.forest.length; ++i) {
+    let node = queue.forest[i];
     if (node) {
       let displayMatrix = displayBinomialNode(node);
-      console.log(`k${node.index}:`);
+      console.log(`k${node.index}(index-${i}):`);
       let rowLen = displayMatrix[displayMatrix.length - 1].length;
       let colLen = displayMatrix.length;
       for (let r = 0; r < rowLen; ++r) {
@@ -289,6 +290,8 @@ export function validateBinomialQueue(queue) {
 
       validateBinomialNode(node);
     }
+  }
+  queue.forest.forEach(node => {
   });
 
   console.log('二项式队列性质校验成功');
