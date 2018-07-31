@@ -330,7 +330,7 @@ function displayBinomialNode(node) {
   return result;
 }
 
-function padLeft(s, n) {
+export function padLeft(s, n) {
   let r = s;
   if (r.length < n) {
     let nn = n - r.length;

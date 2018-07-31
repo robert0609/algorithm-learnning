@@ -14,7 +14,8 @@ import 'babel-polyfill';
 // import { run } from './redBlackTree';
 // import { run } from './splayTree';
 // import { run } from './leftHeap';
-import { run } from './binomialQueue';
+// import { run } from './binomialQueue';
+import { run } from './unionFindSet';
 
 /**
  * 入口函数
