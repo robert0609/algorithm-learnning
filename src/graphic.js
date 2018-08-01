@@ -72,7 +72,8 @@ export class DirectionGraphic {
       buffer[index] = [];
     });
     edges.forEach(elem => {
-      buffer[elem.from.id].push(elem.to);
+      let arr = buffer[elem.from.id];
+      arr[elem.to.id] = elem.weight;
     });
 
     this[privatePropertySet] = {
@@ -90,8 +91,17 @@ export class DirectionGraphic {
   }
 
   output() {
-    this.points.forEach((elem, index) => {
-      console.log(`${elem.toString()}: [${this.nextPoints[index].map(elem => elem.toString()).join()}]`);
+    this.points.forEach((elem) => {
+      let arr = [];
+      let nps = this.nextPoints[elem.id];
+      for (let i = 0; i < nps.length; ++i) {
+        let np = nps[i];
+        if (np === undefined) {
+          continue;
+        }
+        arr.push(this.points[i].toString());
+      }
+      console.log(`${elem.toString()}: [${arr.join()}]`);
     });
   }
 
@@ -106,12 +116,15 @@ export class DirectionGraphic {
     while (points.length > 0) {
       let p = points.shift();
       let nextPoints = this.nextPoints[p.id];
-      nextPoints.forEach(elem => {
-        if (status[elem.id] === PointStatus.known) {
+      nextPoints.forEach((elem, id) => {
+        if (elem === undefined) {
           return;
         }
-        points.push(elem);
-        status[elem.id] = PointStatus.known;
+        if (status[id] === PointStatus.known) {
+          return;
+        }
+        points.push(this.points[id]);
+        status[id] = PointStatus.known;
       });
       result.push(p);
     }
@@ -122,6 +135,7 @@ export class DirectionGraphic {
     let result = [];
 
     let status = [];
+    let totalPoints = this.points;
     let nextPointsCollection = this.nextPoints;
 
     recursion(from);
@@ -134,11 +148,14 @@ export class DirectionGraphic {
 
       let nextPoints = nextPointsCollection[point.id];
       if (nextPoints.length > 0) {
-        nextPoints.forEach(p => {
-          if (status[p.id] === PointStatus.checking || status[p.id] === PointStatus.known) {
+        nextPoints.forEach((p, id) => {
+          if (p === undefined) {
             return;
           }
-          recursion(p);
+          if (status[id] === PointStatus.checking || status[id] === PointStatus.known) {
+            return;
+          }
+          recursion(totalPoints[id]);
         });
       }
       status[point.id] = PointStatus.known;
@@ -151,6 +168,7 @@ export class DirectionGraphic {
       return ['存在圈，无法拓扑排序'];
     }
     let status = [];
+    let totalPoints = this.points;
     let nextPointsCollection = this.nextPoints;
     let orderdPoints = [];
     while (inDegreeZero.length > 0) {
@@ -163,11 +181,14 @@ export class DirectionGraphic {
     function recursion(point) {
       let nextPoints = nextPointsCollection[point.id];
       if (nextPoints.length > 0) {
-        nextPoints.forEach(p => {
-          if (status[p.id] === PointStatus.known) {
+        nextPoints.forEach((p, id) => {
+          if (p === undefined) {
             return;
           }
-          recursion(p);
+          if (status[id] === PointStatus.known) {
+            return;
+          }
+          recursion(totalPoints[id]);
         });
       }
       status[point.id] = PointStatus.known;
@@ -188,10 +209,14 @@ export class DirectionGraphic {
     let orderdPoints = [];
     while (inDegreeZero.length > 0) {
       let p = inDegreeZero.shift();
-      this.nextPoints[p.id].forEach(elem => {
-        elem.inDegree -= 1;
-        if (elem.inDegree === 0) {
-          inDegreeZero.push(elem);
+      this.nextPoints[p.id].forEach((elem, id) => {
+        if (elem === undefined) {
+          return;
+        }
+        let np = this.points[id];
+        np.inDegree -= 1;
+        if (np.inDegree === 0) {
+          inDegreeZero.push(np);
         }
       });
       orderdPoints.push(p);
@@ -226,7 +251,12 @@ export class DirectionGraphic {
           return;
         }
         paths[elem.id] = currentDistance;
-        currentDistanceMoreOnePoints = currentDistanceMoreOnePoints.concat(this.nextPoints[elem.id]);
+        this.nextPoints[elem.id].forEach((weight, id) => {
+          if (weight === undefined) {
+            return;
+          }
+          currentDistanceMoreOnePoints.push(this.points[id]);
+        });
       });
 
       currentDistancePoints = currentDistanceMoreOnePoints;
@@ -236,8 +266,65 @@ export class DirectionGraphic {
     return paths;
   }
 
-  [dijkstra]() {
-    //TODO:
+  /**
+   * 求赋权最短路径
+   */
+  [dijkstra](from) {
+    let totalPoints = this.points;
+    let nextPointsCollection = this.nextPoints;
+
+    let status = [];
+    let distances = [];
+    this.points.forEach((elem) => {
+      status[elem.id] = PointStatus.unknown;
+      distances[elem.id] = Infinity;
+    });
+    status[from.id] = PointStatus.known;
+    distances[from.id] = 0;
+    let currentShortestTargetPoints = [];
+    currentShortestTargetPoints.push(from);
+    while (currentShortestTargetPoints.length > 0) {
+      currentShortestTargetPoints = findNextShortestTargetPoints(currentShortestTargetPoints);
+    }
+
+    return distances;
+
+    function findNextShortestTargetPoints(points) {
+      while (points.length > 0) {
+        let p = points.shift();
+        nextPointsCollection[p.id].forEach((weight, id) => {
+          if (weight === undefined) {
+            return;
+          }
+          if (status[id] === PointStatus.known) {
+            return;
+          }
+          distances[id] = Math.min(distances[id], distances[p.id] + weight);
+        });
+      }
+      //找出除去已知的节点外目前最短路径的节点
+      let shortestDistance = Infinity;
+      distances.forEach((d, id) => {
+        if (status[id] === PointStatus.known) {
+          return;
+        }
+        if (d < shortestDistance) {
+          shortestDistance = d;
+        }
+      });
+      let result = [];
+      distances.forEach((d, id) => {
+        if (status[id] === PointStatus.known) {
+          return;
+        }
+        if (d === shortestDistance) {
+          result.push(totalPoints[id]);
+          status[id] = PointStatus.known;
+        }
+      });
+
+      return result;
+    }
   }
 }
 
@@ -280,10 +367,44 @@ export function run() {
   let orderdPoints = dg.sort();
   console.log(`拓扑排序：${orderdPoints.map(elem => elem.toString()).join()}`);
 
-  // let from = points[1];
-  // console.log(`节点${from.toString()}到以下个节点的无权最短路径分别是：`);
-  // let paths = dg.shortestPathWithoutWeight(from);
-  // points.forEach((elem, index) => {
-  //   console.log(`----到节点${elem.toString()}： ${paths[index]}`);
-  // });
+  let from = points[1];
+  console.log(`节点${from.toString()}到以下个节点的无权最短路径分别是：`);
+  let paths = dg.shortestPathWithoutWeight(from);
+  points.forEach((elem, index) => {
+    console.log(`----到节点${elem.toString()}： ${paths[index]}`);
+  });
+
+  console.log(`节点${from.toString()}到以下个节点的无权最短路径(dijkstra算法)分别是：`);
+  let distances = dg[dijkstra](from);
+  points.forEach((elem, index) => {
+    console.log(`----到节点${elem.toString()}： ${distances[index]}`);
+  });
+
+  let points1 = [
+    new Point('A'),
+    new Point('B'),
+    new Point('C'),
+    new Point('D'),
+    new Point('E'),
+    new Point('F')
+  ];
+  let edges1 = [
+    new Edge(points[0], points[1], 6),
+    new Edge(points[0], points[2], 3),
+    new Edge(points[2], points[1], 2),
+    new Edge(points[1], points[3], 10),
+    new Edge(points[2], points[3], 5),
+    new Edge(points[3], points[4], 1),
+    new Edge(points[4], points[5], 7),
+    new Edge(points[3], points[5], 8)
+  ];
+  let dg1 = new DirectionGraphic(points1, edges1);
+  dg1.output();
+
+  let from1 = points[0];
+  console.log(`节点${from1.toString()}到以下个节点的无权最短路径(dijkstra算法)分别是：`);
+  let distances1 = dg1[dijkstra](from1);
+  points1.forEach((elem, index) => {
+    console.log(`----到节点${elem.toString()}： ${distances1[index]}`);
+  });
 }
