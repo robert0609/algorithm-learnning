@@ -4,7 +4,7 @@ const BFS = Symbol('BFS');
 const DFS = Symbol('DFS');
 const dijkstra = Symbol('Dijkstra');
 
-const PointStatus = {
+export const PointStatus = {
   unknown: 0,
   checking: 1,
   known: 2
