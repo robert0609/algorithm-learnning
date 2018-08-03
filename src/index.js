@@ -10,12 +10,13 @@ import 'babel-polyfill';
 // import { run } from './avlTree';
 // import { run } from './binaryFullTree';
 // import { run } from './quickSort';
-import { run } from './graphic';
 // import { run } from './redBlackTree';
 // import { run } from './splayTree';
 // import { run } from './leftHeap';
 // import { run } from './binomialQueue';
 // import { run } from './unionFindSet';
+// import { run } from './graphic';
+// import { run } from './graphicNonDirective';
 
 /**
  * 入口函数

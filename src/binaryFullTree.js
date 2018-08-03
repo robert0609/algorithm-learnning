@@ -4,12 +4,14 @@ const privatePropertySet = Symbol('privatePropertySet');
 const pushSingle = Symbol('pushSingle');
 const switchUp = Symbol('switchUp');
 const switchDown = Symbol('switchDown');
+const _compare = Symbol('compare');
 
 export class BinaryFullTree {
-  constructor() {
+  constructor(compare = (a, b) => a - b) {
     this[privatePropertySet] = {
       buffer: [null]
     };
+    this[_compare] = compare;
   }
 
   [pushSingle](value) {
@@ -22,7 +24,7 @@ export class BinaryFullTree {
     if (parentIndex > 0) {
       let buffer = this[privatePropertySet].buffer;
       //上行交换
-      if (buffer[childIndex] < buffer[parentIndex]) {
+      if (this[_compare](buffer[childIndex], buffer[parentIndex]) < 0) {
         [ buffer[parentIndex], buffer[childIndex] ] = [ buffer[childIndex], buffer[parentIndex] ];
         this[switchUp](parentIndex);
       }
@@ -38,12 +40,12 @@ export class BinaryFullTree {
       let rightChildIndex = parentIndex * 2 + 1;
       let smallerIndex = leftChildIndex;
       if (rightChildIndex < buffer.length) {
-        if (buffer[rightChildIndex] < buffer[leftChildIndex]) {
+        if (this[_compare](buffer[rightChildIndex], buffer[leftChildIndex]) < 0) {
           smallerIndex = rightChildIndex;
         }
       }
       //下行交换
-      if (buffer[parentIndex] > buffer[smallerIndex]) {
+      if (this[_compare](buffer[parentIndex], buffer[smallerIndex]) > 0) {
         [ buffer[parentIndex], buffer[smallerIndex] ] = [ buffer[smallerIndex], buffer[parentIndex] ];
         this[switchDown](smallerIndex);
       }
