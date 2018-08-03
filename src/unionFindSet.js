@@ -1,23 +1,25 @@
 import { padLeft } from './validate';
 
 const privatePropertySet = Symbol('privatePropertySet');
+const _getHashId = Symbol('getHashId');
 
 export class UnionFindSet {
-  constructor(valueList = []) {
+  constructor(valueList = [], getHashId = v => v) {
     this[privatePropertySet] = {
       buffer: []
     };
+    this[_getHashId] = getHashId;
 
     valueList.forEach(value => {
-      this[privatePropertySet].buffer[value] = -1;
+      this[privatePropertySet].buffer[this[_getHashId](value)] = -1;
     });
   }
 
   find(value) {
     let buffer = this[privatePropertySet].buffer;
     let values = [];
-    let rootValue = loop(value);
-    console.log(`${value}的集合名是${rootValue}`);
+    let rootValue = loop(this[_getHashId](value));
+    // console.log(`${this[_getHashId](value)}的集合名是${rootValue}`);
     //路径压缩
     values.forEach(v => {
       buffer[v] = rootValue;
@@ -38,8 +40,8 @@ export class UnionFindSet {
 
   union(value1, value2) {
     let buffer = this[privatePropertySet].buffer;
-    let set1 = loop(value1);
-    let set2 = loop(value2);
+    let set1 = loop(this[_getHashId](value1));
+    let set2 = loop(this[_getHashId](value2));
     if (set1 === set2) {
       return;
     }
@@ -54,7 +56,7 @@ export class UnionFindSet {
       buffer[set1] = set2;
       buffer[set2] = count1 + count2;
     }
-    console.log(`合并${value1}与${value2}所属的集合`);
+    // console.log(`合并${this[_getHashId](value1)}与${this[_getHashId](value2)}所属的集合`);
 
     function loop(value) {
       let parentValue = buffer[value];
@@ -72,6 +74,9 @@ export class UnionFindSet {
     let indexList = 'values:          ';
     let parentOrCount = 'parent or count: ';
     buffer.forEach((item, index) => {
+      if (item === undefined) {
+        return;
+      }
       indexList += padLeft(index.toString(), 3) + ',';
       parentOrCount += padLeft(item.toString(), 3) + ',';
     });

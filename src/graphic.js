@@ -60,7 +60,7 @@ export class Edge {
   }
 
   toString() {
-    return `${this[privatePropertySet].from.toString()} ----> ${this[privatePropertySet].to.toString()}`;
+    return `${this[privatePropertySet].from.toString()} --${this[privatePropertySet].weight.toString()}--> ${this[privatePropertySet].to.toString()}`;
   }
 }
 
@@ -402,7 +402,7 @@ export function run() {
   dg1.output();
 
   let from1 = points[0];
-  console.log(`节点${from1.toString()}到以下个节点的无权最短路径(dijkstra算法)分别是：`);
+  console.log(`节点${from1.toString()}到以下个节点的赋权最短路径(dijkstra算法)分别是：`);
   let distances1 = dg1[dijkstra](from1);
   points1.forEach((elem, index) => {
     console.log(`----到节点${elem.toString()}： ${distances1[index]}`);
